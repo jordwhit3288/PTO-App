@@ -140,26 +140,33 @@ def main() -> None:
     after_use_weeks = round(after_use_hours / hours_per_week, 2)
 
     st.subheader("PTO results")
-    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
-    metric_col1.metric("Current balance", f"{current_hours:.2f} hrs", f"{current_weeks:.2f} weeks")
-    metric_col2.metric("Projected remaining", f"{projected_hours:.2f} hrs", f"{projected_days:.2f} days")
-    metric_col3.metric("Projected weeks", f"{projected_weeks:.2f} weeks", f"{hours_per_week} hrs/week")
-    metric_col4.metric("Remaining periods", remaining_periods)
+    col1, col2 = st.columns([1.2, 1.2])
+    with col1:
+        st.metric("Current balance", f"{current_hours:.2f} hrs", f"{current_weeks:.2f} weeks")
+    with col2:
+        st.metric("Projected remaining", f"{projected_hours:.2f} hrs", f"{projected_weeks:.2f} weeks")
+
+    col3, col4 = st.columns([1, 1])
+    with col3:
+        st.metric("Days remaining", f"{projected_days:.2f} days")
+    with col4:
+        st.metric("Pay periods left", remaining_periods)
 
     st.markdown("---")
 
     if plan_pto:
-        use_col1, use_col2, use_col3 = st.columns(3)
-        use_col1.metric("Planned PTO use", f"{planned_use_hours:.2f} hrs", f"{used_weeks:.2f} weeks")
-        use_col2.metric("Balance after use", f"{after_use_hours:.2f} hrs", f"{after_use_days:.2f} days")
-        use_col3.metric("Weeks left after use", f"{after_use_weeks:.2f} weeks")
+        use_col1, use_col2 = st.columns([1.2, 1.2])
+        with use_col1:
+            st.metric("Planned PTO use", f"{planned_use_hours:.2f} hrs", f"{used_weeks:.2f} weeks")
+        with use_col2:
+            st.metric("Balance after use", f"{after_use_hours:.2f} hrs", f"{after_use_weeks:.2f} weeks")
         if planned_use_hours > projected_hours:
             st.error(
                 "Your planned PTO use exceeds projected remaining hours. "
                 "Reduce planned PTO or increase accrual rate."
             )
 
-    tabs = st.tabs(["Summary", "Projection", "Details"])
+    tabs = st.tabs(["Summary", "Details", "Data"])
     with tabs[0]:
         st.subheader("Current PTO summary")
         st.write(
@@ -179,21 +186,6 @@ def main() -> None:
             )
 
     with tabs[1]:
-        st.subheader("Future accrual projection")
-        if remaining_periods > 0:
-            projection_df = build_projection_dataframe(current_hours, accrual_rate, remaining_periods)
-            projection_df["Projected PTO days"] = projection_df["Projected PTO hours"].apply(
-                lambda value: round(value / hours_per_day, 2)
-            )
-            projection_df["Projected PTO weeks"] = projection_df["Projected PTO hours"].apply(
-                lambda value: round(value / hours_per_week, 2)
-            )
-            st.line_chart(projection_df.set_index("Pay period #")["Projected PTO hours"])
-            st.dataframe(projection_df, use_container_width=True)
-        else:
-            st.warning("No pay periods remain before the selected year-end.")
-
-    with tabs[2]:
         st.subheader("Calculation details")
         st.write(
             "This calculator converts your current balance into hours, "
@@ -206,6 +198,20 @@ def main() -> None:
             f"- Selected pay period: **{pay_period}**  \n"
             f"- Year-end date: **{end_of_year}**"
         )
+
+    with tabs[2]:
+        st.subheader("Accrual data table")
+        if remaining_periods > 0:
+            projection_df = build_projection_dataframe(current_hours, accrual_rate, remaining_periods)
+            projection_df["Projected PTO days"] = projection_df["Projected PTO hours"].apply(
+                lambda value: round(value / hours_per_day, 2)
+            )
+            projection_df["Projected PTO weeks"] = projection_df["Projected PTO hours"].apply(
+                lambda value: round(value / hours_per_week, 2)
+            )
+            st.dataframe(projection_df, use_container_width=True)
+        else:
+            st.warning("No pay periods remain before the selected year-end.")
 
 
 if __name__ == "__main__":
