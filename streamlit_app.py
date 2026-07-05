@@ -18,7 +18,11 @@ def main():
 
     accrual_rate = st.number_input("How many hours do you accrue per check?", key='pto_accrual_rate')
     current_date = datetime.datetime.now()
-    end_of_year = datetime.datetime(current_date.year, 12, 31)
+    if twelve_hour_shift_option == 'No':
+        end_of_year = datetime.datetime(current_date.year, 12, 31)
+    else:
+        end_of_year = datetime.datetime(current_date.year, 6, 30)
+        
     remaining_biweekly_periods = (end_of_year - current_date).days // 14
 
     if days_or_hours == 'Days' and twelve_hour_shift_option == 'No':
