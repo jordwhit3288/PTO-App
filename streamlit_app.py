@@ -21,8 +21,9 @@ def main():
     if twelve_hour_shift_option == 'No':
         end_of_year = datetime.datetime(current_date.year, 12, 31)
     else:
-        end_of_year = datetime.datetime(current_date.year, 6, 30)
-        
+        next_year = current_date.year + 1
+        end_of_year = datetime.datetime(next_year, 6, 30)
+
     remaining_biweekly_periods = (end_of_year - current_date).days // 14
 
     if days_or_hours == 'Days' and twelve_hour_shift_option == 'No':
