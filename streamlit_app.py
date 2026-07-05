@@ -157,9 +157,9 @@ def main() -> None:
             "including projected accruals from each future pay period."
         )
         st.markdown(
-            f"- **Current PTO balance:** {current_balance:.2f} {balance_unit}  
-             - **Accrual rate:** {accrual_rate:.2f} hours per pay period  
-             - **Pay period length:** {pay_period}"
+            f"- **Current PTO balance:** {current_balance:.2f} {balance_unit}  \n"
+            f"- **Accrual rate:** {accrual_rate:.2f} hours per pay period  \n"
+            f"- **Pay period length:** {pay_period}"
         )
         if plan_pto:
             st.markdown(f"- **Planned PTO use:** {planned_use_value:.2f} {planned_use_unit}")
